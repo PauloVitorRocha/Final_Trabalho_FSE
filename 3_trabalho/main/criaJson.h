@@ -15,10 +15,10 @@
 #include "sdkconfig.h"
 
 #include "cJSON.h"
-// #include "mqtt.h"
+#include "mqtt.h"
 #include "dht.h"
 #include "led.h"
-// #include "botao.h"
+#include "botao.h"
 
 int criaJson(cJSON *espInfo, cJSON *titulo, char nome[], float info);
 void mandaMensagem(char *topico, float info);

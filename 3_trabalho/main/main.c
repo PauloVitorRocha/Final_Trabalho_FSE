@@ -16,13 +16,15 @@
 #include "dht.h"
 #include "botao.h"
 #include "wifi.h"
+#include "mqtt.h"
 
 #define LED 2
 #define GPIO_N4 4
 
 xQueueHandle filaDeInterrupcao;
 
-// xSemaphoreHandle conexaoWifiSemaphore;
+xSemaphoreHandle conexaoWifiSemaphore;
+xSemaphoreHandle conexaoMQTTSemaphore;
 xSemaphoreHandle esperaLed;
 
 char *macAddress;
@@ -44,11 +46,32 @@ void getMacAddress()
     // printf("MAC ADDRESS = %s\n", macAddress);
 }
 
-// static void IRAM_ATTR gpio_isr_handler(void *args)
-// {
-//     int pino = (int)args;
-//     xQueueSendFromISR(filaDeInterrupcao, &pino, NULL);
-// }
+void conectadoWifi(void *params)
+{
+    while (true)
+    {
+        if (xSemaphoreTake(conexaoWifiSemaphore, portMAX_DELAY))
+        {
+            // Processamento Internet
+            mqtt_start();
+        }
+    }
+}
+
+void trataComunicacaoComServidor(void *params)
+{
+    char mensagem[50];
+    if (xSemaphoreTake(conexaoMQTTSemaphore, portMAX_DELAY))
+    {
+        while (true)
+        {
+            float temperatura = 20.0 + (float)rand() / (float)(RAND_MAX / 10.0);
+            sprintf(mensagem, "temperatura1: %f", temperatura);
+            mqtt_envia_mensagem("sensores/temperatura", mensagem);
+            vTaskDelay(3000 / portTICK_PERIOD_MS);
+        }
+    }
+}
 
 void getDhtTemperature(void *params)
 {
@@ -64,41 +87,6 @@ void getDhtTemperature(void *params)
     }
 }
 
-// void trataInterrupcaoBotao(void *params)
-// {
-//     int pino;
-//     int contador = 0;
-//     int estadoLed = 0;
-
-//     while (true)
-//     {
-//         if (xQueueReceive(filaDeInterrupcao, &pino, portMAX_DELAY))
-//         {
-//             // De-bouncing
-//             int estado = gpio_get_level(pino);
-
-//             if (estado == 1)
-//             {
-//                 gpio_isr_handler_remove(pino);
-//                 printf("estado= %d, gpio=%d\n", estado, gpio_get_level(pino));
-//                 while (gpio_get_level(pino) == estado)
-//                 {
-//                     printf("Aguardante\n");
-//                     vTaskDelay(50 / portTICK_PERIOD_MS);
-//                 }
-
-//                 contador++;
-//                 printf("AQ\n");
-//                 ligaDesligaLed();
-//                 printf("Os botões foram acionados %d vezes. Botão: %d\n", contador, pino);
-
-//                 // Habilitar novamente a interrupção
-//                 vTaskDelay(50 / portTICK_PERIOD_MS);
-//                 gpio_isr_handler_add(pino, gpio_isr_handler, (void *)pino);
-//             }
-//         }
-//     }
-// }
 
 void app_main(void)
 {
@@ -113,13 +101,17 @@ void app_main(void)
 
     inicializaBotao();
     inicializaLed();
-    wifi_init();
     getMacAddress();
 
     esperaLed = xSemaphoreCreateBinary();
-    // conexaoWifiSemaphore = xSemaphoreCreateBinary();
+    conexaoWifiSemaphore = xSemaphoreCreateBinary();
+    conexaoMQTTSemaphore = xSemaphoreCreateBinary();
+    wifi_start();
 
+    xTaskCreate(&conectadoWifi, "Conexão ao MQTT", 4096, NULL, 1, NULL);
+    xTaskCreate(&trataComunicacaoComServidor, "Comunicação com Broker", 4096, NULL, 1, NULL);
     xTaskCreate(trataInterrupcaoBotao, "TrataBotao", 4096, NULL, 1, NULL);
     xTaskCreate(getDhtTemperature, "getTemp", 4096, NULL, 1, NULL);
+
 
 }

@@ -1,4 +1,4 @@
-# Install script for directory: /Users/paulovitor/esp/blink/main
+# Install script for directory: /Users/paulovitor/esp/Final_Trabalho_FSE/3_trabalho/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

@@ -1882,7 +1882,7 @@
             {
                 "children": [],
                 "depends_on": null,
-                "help": "SSID (network name) for the example to connect to.",
+                "help": "Nome da rede Wifi.",
                 "id": "ESP_WIFI_SSID",
                 "name": "ESP_WIFI_SSID",
                 "range": null,
@@ -1892,40 +1892,27 @@
             {
                 "children": [],
                 "depends_on": null,
-                "help": "WiFi password (WPA or WPA2) for the example to use.",
+                "help": "Senha do WiFi (WPA or WPA2).",
                 "id": "ESP_WIFI_PASSWORD",
                 "name": "ESP_WIFI_PASSWORD",
                 "range": null,
-                "title": "WiFi Password",
+                "title": "Senha do Wifi",
                 "type": "string"
             },
             {
                 "children": [],
                 "depends_on": null,
-                "help": "WiFi channel (network channel) for the example to use.",
-                "id": "ESP_WIFI_CHANNEL",
-                "name": "ESP_WIFI_CHANNEL",
-                "range": [
-                    1,
-                    13
-                ],
-                "title": "WiFi Channel",
-                "type": "int"
-            },
-            {
-                "children": [],
-                "depends_on": null,
-                "help": "Max number of the STA connects to AP.",
-                "id": "ESP_MAX_STA_CONN",
-                "name": "ESP_MAX_STA_CONN",
+                "help": "Configure o valor m\u00e1ximo de tentativas de conex\u00e3o.",
+                "id": "ESP_MAXIMUM_RETRY",
+                "name": "ESP_MAXIMUM_RETRY",
                 "range": null,
-                "title": "Maximal STA connections",
+                "title": "N\u00famero m\u00e1ximo de tentativas de conex\u00e3o",
                 "type": "int"
             }
         ],
         "depends_on": null,
-        "id": "wi-fi-configuration",
-        "title": "Wi-fi Configuration",
+        "id": "configura\u00e7\u00e3o-do-wifi-configuration",
+        "title": "Configura\u00e7\u00e3o do Wifi Configuration",
         "type": "menu"
     },
     {
