@@ -1,6 +1,6 @@
 #include "criaJson.h"
 
-// extern char topicoComodo[300];
+extern char topicoComodo[300];
 extern int estadoLed;
 extern int clickBotao;
 extern char *macAddress;
@@ -49,17 +49,14 @@ void mandaMensagem(char *topico, float info)
     while (criaJson(json, mensagem, topico, info));
 
     char *info2 = cJSON_Print(json);
-    printf("%s\n", info2);
     char enviaEstado[500];
-    sprintf(enviaEstado, "%s/%s", topico, topico);
+    sprintf(enviaEstado, "%s/%s", topicoComodo, topico);
     mqtt_envia_mensagem(enviaEstado, info2);
     cJSON_Delete(json);
 }
 
 void mandaMensagemEstado()
 {
-    printf("AQ\n");
-    char teste[] = "testando";
     cJSON *json = cJSON_CreateObject();
     while (json == NULL)
     {
@@ -70,22 +67,18 @@ void mandaMensagemEstado()
     }
 
     cJSON *id = NULL;
-    while (criaJsonStr(json, id))
-        ;
+    while (criaJsonStr(json, id));
 
     cJSON *saida = NULL;
-    while (criaJson(json, saida, "saida", estadoLed))
-        ;
+    while (criaJson(json, saida, "saida", estadoLed));
 
     cJSON *entrada = NULL;
-    while (criaJson(json, entrada, "entrada", clickBotao))
-        ;
+    while (criaJson(json, entrada, "entrada", clickBotao));
 
     char *info = cJSON_Print(json);
-    printf("%s\n", info);
-
     char enviaEstado[500];
-    sprintf(enviaEstado, "%s/estado", teste);
+    sprintf(enviaEstado, "%s/estado", topicoComodo);
+    printf("estado(mandaMensagemEstado) = %s\n", enviaEstado);
     mqtt_envia_mensagem(enviaEstado, info);
     cJSON_Delete(json);
 }

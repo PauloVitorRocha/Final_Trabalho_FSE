@@ -31,21 +31,18 @@ void trataInterrupcaoBotao(void *params)
 {
     int pino;
     int contador = 0;
-
     while (true)
     {
+        printf("entrei aqui\n");
         if (xQueueReceive(filaDeInterrupcao, &pino, portMAX_DELAY))
         {
             // De-bouncing
             int estado = gpio_get_level(pino);
+            printf("estado = %d\n", estado);
             if (estado == 1)
             {
+                printf("estado =1\n");
                 gpio_isr_handler_remove(pino);
-                while (gpio_get_level(pino) == estado)
-                {
-                    vTaskDelay(50 / portTICK_PERIOD_MS);
-                }
-
                 clickBotao = !clickBotao;
 
                 mandaMensagemEstado();

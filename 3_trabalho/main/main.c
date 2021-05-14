@@ -29,22 +29,22 @@ xSemaphoreHandle esperaLed;
 
 char *macAddress;
 
-void getMacAddress()
-{
+// void getMacAddress()
+// {
 
-    uint8_t *mac = (uint8_t *)malloc(sizeof(uint8_t) * 15);
-    esp_efuse_mac_get_default(mac);
-    int interm[20];
-    macAddress = (char *)malloc(sizeof(char *) * 100);
-    for (int i = 0; i < 6; i++)
-    {
-        interm[i] = mac[i];
-        sprintf(macAddress, "%X", interm[i]);
-        macAddress += 2;
-    }
-    macAddress -= 12;
-    // printf("MAC ADDRESS = %s\n", macAddress);
-}
+//     uint8_t *mac = (uint8_t *)malloc(sizeof(uint8_t) * 15);
+//     esp_efuse_mac_get_default(mac);
+//     int interm[20];
+//     macAddress = (char *)malloc(sizeof(char *) * 100);
+//     for (int i = 0; i < 6; i++)
+//     {
+//         interm[i] = mac[i];
+//         sprintf(macAddress, "%X", interm[i]);
+//         macAddress += 2;
+//     }
+//     macAddress -= 12;
+//     // printf("MAC ADDRESS = %s\n", macAddress);
+// }
 
 void conectadoWifi(void *params)
 {
@@ -53,6 +53,7 @@ void conectadoWifi(void *params)
         if (xSemaphoreTake(conexaoWifiSemaphore, portMAX_DELAY))
         {
             // Processamento Internet
+            printf("start msqtt\n");
             mqtt_start();
         }
     }
@@ -61,14 +62,18 @@ void conectadoWifi(void *params)
 void trataComunicacaoComServidor(void *params)
 {
     char mensagem[50];
+    float temperatura, umidade;
+
     if (xSemaphoreTake(conexaoMQTTSemaphore, portMAX_DELAY))
     {
         while (true)
         {
-            float temperatura = 20.0 + (float)rand() / (float)(RAND_MAX / 10.0);
-            sprintf(mensagem, "temperatura1: %f", temperatura);
-            mqtt_envia_mensagem("sensores/temperatura", mensagem);
-            vTaskDelay(3000 / portTICK_PERIOD_MS);
+            dht_read_float_data(DHT_TYPE_DHT11, GPIO_N4, &umidade, &temperatura);
+            ESP_LOGI("A", "temp: %f, humidity: %f", temperatura, umidade);
+            mandaMensagem("temperatura", temperatura);
+            mandaMensagem("umidade", umidade);
+            mandaMensagemEstado();
+            vTaskDelay(30000 / portTICK_PERIOD_MS);
         }
     }
 }
@@ -83,7 +88,7 @@ void getDhtTemperature(void *params)
         mandaMensagem("temperatura", temperatura);
         mandaMensagem("umidade", umidade);
         mandaMensagemEstado();
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay(20000 / portTICK_PERIOD_MS);
     }
 }
 
@@ -101,7 +106,7 @@ void app_main(void)
 
     inicializaBotao();
     inicializaLed();
-    getMacAddress();
+    // getMacAddress();
 
     esperaLed = xSemaphoreCreateBinary();
     conexaoWifiSemaphore = xSemaphoreCreateBinary();

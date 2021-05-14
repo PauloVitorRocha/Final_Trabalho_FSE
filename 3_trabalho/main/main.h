@@ -22,5 +22,6 @@
 
 void conectadoWifi(void *params);
 void trataComunicacaoComServidor(void *params);
+void getMacAddress();
 
 #endif

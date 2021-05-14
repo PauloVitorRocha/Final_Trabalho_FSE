@@ -17,6 +17,8 @@
 
 #include "esp_log.h"
 #include "mqtt_client.h"
+#include "main.h"
+#include "myNvs.h"
 
 #include "mqtt.h"
 
@@ -24,18 +26,97 @@
 
 extern xSemaphoreHandle conexaoMQTTSemaphore;
 esp_mqtt_client_handle_t client;
+char *macAddress;
+char topicoComodo[300];
+
+void getMacAddress()
+{
+
+    uint8_t *mac = (uint8_t *)malloc(sizeof(uint8_t) * 15);
+    esp_efuse_mac_get_default(mac);
+    int interm[20];
+    macAddress = (char *)malloc(sizeof(char *) * 100);
+    for (int i = 0; i < 6; i++)
+    {
+        interm[i] = mac[i];
+        sprintf(macAddress, "%X", interm[i]);
+        macAddress += 2;
+    }
+    macAddress -= 12;
+}
+
+void conexaoEsp()
+{   
+    char topicoMqttConnected[100] = "fse2020/170062465/dispositivos/";
+    getMacAddress();
+    strcat(topicoMqttConnected, macAddress);
+
+    cJSON *mqtt = cJSON_CreateObject();
+    if (mqtt == NULL)
+    {
+        ESP_LOGE("CONEXAOSV", "erro ao criar o objeto json, tentando novamente em 3 segundos\n");
+        return;
+    }
+    cJSON *message = NULL;
+    message = cJSON_CreateString(macAddress);
+    cJSON_AddItemToObject(mqtt, "id", message);
+    char *info = cJSON_Print(mqtt);
+
+    printf("manda mensagem(conexaoEsp) com ID da esp no topico de dispositivos\n");
+    mqtt_envia_mensagem(topicoMqttConnected, info);
+    mqtt_inscricao(topicoMqttConnected);
+}
+
+void mqtt_inscricao(char *topico)
+{
+    int message_id = esp_mqtt_client_subscribe(client, topico, 0);
+    printf("Se cadastra(subscribe) no topico %s\n", topico);
+    ESP_LOGI(TAG, "Inscrição enviada, ID: %d", message_id);
+}
+
+void pega_Comodo_MQTT_DATA(char buffer[])
+{
+
+    cJSON *jsonComodo = cJSON_Parse(buffer);
+    const cJSON *atributte = NULL;
+    atributte = cJSON_GetObjectItemCaseSensitive(jsonComodo, "comodo");
+    if (cJSON_IsString(atributte) && (atributte->valuestring != NULL))
+    {
+        strcpy(topicoComodo, "fse2020/170062465/");
+        strcat(topicoComodo, atributte->valuestring);
+        grava_valor_nvs();
+        cJSON_Delete(jsonComodo);
+        xSemaphoreGive(conexaoMQTTSemaphore);
+    }
+    else
+    {
+        atributte = cJSON_GetObjectItemCaseSensitive(jsonComodo, "saida");
+        if (cJSON_IsNumber(atributte) && (atributte->valueint == 0 || atributte->valueint == 1))
+        {
+            ligaDesligaLed(atributte->valueint);
+        }
+    }
+}
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 {
     esp_mqtt_client_handle_t client = event->client;
-    int msg_id;
+    // int msg_id;
 
     switch (event->event_id)
     {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        xSemaphoreGive(conexaoMQTTSemaphore);
-        msg_id = esp_mqtt_client_subscribe(client, "servidor/resposta", 0);
+        conexaoEsp();
+        if (le_valor_nvs() == -1)
+        {
+            sprintf(topicoComodo, "fse2020/170062465");
+        }
+        else
+        {
+            xSemaphoreGive(conexaoMQTTSemaphore);
+            printf("%s\n", topicoComodo);
+        }
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
@@ -54,6 +135,10 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         ESP_LOGI(TAG, "MQTT_EVENT_DATA");
         printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
         printf("DATA=%.*s\r\n", event->data_len, event->data);
+        char buffer[100];
+        memcpy(buffer, event->data, event->data_len);
+        buffer[event->data_len] = '\0';
+        pega_Comodo_MQTT_DATA(buffer);
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -83,6 +168,7 @@ void mqtt_start()
 
 void mqtt_envia_mensagem(char *topico, char *mensagem)
 {
-    int message_id = esp_mqtt_client_publish(client, "/test", mensagem, 0, 1, 0);
-    ESP_LOGI(TAG, "Mesnagem enviada, ID: %d", message_id);
+    int message_id = esp_mqtt_client_publish(client, topico, mensagem, 0, 1, 0);
+    printf("manda msg(mqtt_envia_mensagem): %s para topico %s\n", mensagem, topico);
+        ESP_LOGI(TAG, "Mensagem enviada, ID: %d", message_id);
 }
