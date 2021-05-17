@@ -112,6 +112,7 @@ def menuEsps():
         os.system('cls' if os.name == 'nt' else 'clear')
         print('''----------------- MENU -----------------
 5- Ligar led
+6- Apagar Esp
 7- voltar\n
 ''')
         for i in range(contador_disp):
@@ -131,6 +132,32 @@ def semaphoreKeeper():
     registerEspSemaphore.clear()
     espMenuSemaphore.clear()
     mainMenuSemaphore.set()
+
+
+def resetarEsp():
+    global client
+    global cliente
+    global contador_disp
+    os.system('cls' if os.name == 'nt' else 'clear')
+    for i in range(contador_disp):
+        print(f'{i+1}-', cliente[i].id)
+    inpt = input('Qual esp deseja resetar?\n')
+    inpt = int(inpt)-1
+    while (inpt > contador_disp or inpt < 0):
+        print('opcao inválida, tente novamente')
+        inpt = input('Qual esp deseja resetar?\n')
+    msg = {}
+    msg['reset'] = 1
+    msg = json.dumps(msg)
+    topic = 'fse2020/170062465/dispositivos/' + cliente[inpt].id
+    cliente.pop(inpt)
+    contador_disp-=1
+    cliente.append(mqtt_device())
+    client.unsubscribe('fse2020/170062465/dispositivos/#')
+    client.publish(topic, msg)
+    client.subscribe('fse2020/170062465/dispositivos/#')
+    espMenuSemaphore.set()
+
 
 def ligarLed():
     global client
@@ -166,6 +193,9 @@ def inputzao():
     elif(opcao=='5'):
         espMenuSemaphore.clear()
         ligarLed()
+    elif(opcao=='6'):
+        espMenuSemaphore.clear()
+        resetarEsp()
     elif(opcao=='7'):
         espMenuSemaphore.clear()
         mainMenuSemaphore.set()

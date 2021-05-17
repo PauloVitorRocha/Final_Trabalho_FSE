@@ -65,3 +65,9 @@ void grava_valor_nvs()
     nvs_commit(particao_padrao_handle);
     nvs_close(particao_padrao_handle);
 }
+
+
+void erase_nvs()
+{
+    ESP_ERROR_CHECK(nvs_flash_erase_partition("DadosNVS"));
+}

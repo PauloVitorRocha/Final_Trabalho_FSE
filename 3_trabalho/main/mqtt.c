@@ -32,6 +32,7 @@ esp_mqtt_client_handle_t client;
 char *macAddress;
 char topicoComodo[300];
 int isLowPower=0;
+int reset=0;
 
 void getMacAddress()
 {
@@ -83,8 +84,10 @@ void pega_Comodo_MQTT_DATA(char buffer[])
 
     cJSON *jsonComodo = cJSON_Parse(buffer);
     cJSON *jsonLP = cJSON_Parse(buffer);
+    cJSON *jsonRestart = cJSON_Parse(buffer);
     const cJSON *atributte = NULL;
     const cJSON *isLP = NULL;
+    const cJSON *shouldReset = NULL;
     
     atributte = cJSON_GetObjectItemCaseSensitive(jsonComodo, "comodo");
     if (cJSON_IsString(atributte) && (atributte->valuestring != NULL))
@@ -115,6 +118,14 @@ void pega_Comodo_MQTT_DATA(char buffer[])
         esp_sleep_enable_gpio_wakeup();
         uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
         esp_light_sleep_start();
+    }
+    shouldReset = cJSON_GetObjectItemCaseSensitive(jsonRestart, "reset");
+    if (cJSON_IsNumber(shouldReset) && (shouldReset->valueint == 1))
+    {
+        reset = shouldReset->valueint;
+        printf("Hora de resetar\n");
+        erase_nvs();
+        esp_restart();
     }
 }
 
