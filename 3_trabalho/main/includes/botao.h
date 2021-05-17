@@ -9,7 +9,7 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "main.h"
-// #include "mqtt.h"
+#include "mqtt.h"
 #define BOTAO 0
 
 void inicializaBotao();

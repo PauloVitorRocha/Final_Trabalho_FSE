@@ -73,9 +73,11 @@ def on_message(client, userdata, message):
 
         comodo = input('escreva o comodo onde a esp será cadastrada\n')
         comodo = unidecode.unidecode(comodo).replace(' ', '').lower()
+        isLP = input('Esp é Low Power?(0/1)\n')
         
         msg = {}
         msg['comodo'] = comodo
+        msg['isLP'] = int(isLP)
         jsonComodo = json.dumps(msg)
 
         client.unsubscribe('fse2020/170062465/dispositivos/#')

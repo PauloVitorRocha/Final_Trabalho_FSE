@@ -21,6 +21,9 @@
 #include "./includes/main.h"
 #include "./includes/myNvs.h"
 #include "./includes/mqtt.h"
+#include "esp_sleep.h"
+#include "esp32/rom/uart.h"
+#include "driver/rtc_io.h"
 
 #define TAG "MQTT"
 
@@ -28,6 +31,7 @@ extern xSemaphoreHandle conexaoMQTTSemaphore;
 esp_mqtt_client_handle_t client;
 char *macAddress;
 char topicoComodo[300];
+int isLowPower=0;
 
 void getMacAddress()
 {
@@ -78,7 +82,10 @@ void pega_Comodo_MQTT_DATA(char buffer[])
 {
 
     cJSON *jsonComodo = cJSON_Parse(buffer);
+    cJSON *jsonLP = cJSON_Parse(buffer);
     const cJSON *atributte = NULL;
+    const cJSON *isLP = NULL;
+    
     atributte = cJSON_GetObjectItemCaseSensitive(jsonComodo, "comodo");
     if (cJSON_IsString(atributte) && (atributte->valuestring != NULL))
     {
@@ -95,6 +102,19 @@ void pega_Comodo_MQTT_DATA(char buffer[])
         {
             ligaDesligaLed(atributte->valueint);
         }
+    }
+    isLP = cJSON_GetObjectItemCaseSensitive(jsonLP, "isLP");
+    if (cJSON_IsNumber(isLP) && (isLP->valueint == 1))
+    {
+        isLowPower = isLP->valueint;
+        printf("I AM LOW POWER ESP\n");
+        gpio_pad_select_gpio(BOTAO);
+        gpio_set_direction(BOTAO, GPIO_MODE_INPUT);
+        // Habilita o botão para acordar a placa
+        gpio_wakeup_enable(BOTAO, GPIO_INTR_LOW_LEVEL);
+        esp_sleep_enable_gpio_wakeup();
+        uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
+        esp_light_sleep_start();
     }
 }
 
