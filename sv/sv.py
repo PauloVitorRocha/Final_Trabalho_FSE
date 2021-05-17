@@ -122,7 +122,7 @@ def menuEsps():
             print('##################################\n')
         
         print("\nPressione CTRL+Z para ativar o input")
-        time.sleep(5)
+        time.sleep(.5)
 
 
 def semaphoreKeeper():
@@ -136,11 +136,11 @@ def ligarLed():
     os.system('cls' if os.name == 'nt' else 'clear')
     for i in range(contador_disp):
         print(f'{i+1}-', cliente[i].id)
-    inpt = input('Qual esp deseja ligar o led?\n')
+    inpt = input('Qual esp deseja ligar/desligar o led?\n')
     inpt = int(inpt)-1
     while (inpt > contador_disp or inpt<0):
         print('opcao inválida, tente novamente')
-        inpt = input('Qual esp deseja ligar o led?\n')
+        inpt = input('Qual esp deseja ligar/desligar o led?\n')
     print("msg enviada para ")
     msg = {}
     msg['saida'] = 1

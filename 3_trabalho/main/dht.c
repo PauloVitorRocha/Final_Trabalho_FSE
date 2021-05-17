@@ -38,12 +38,12 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "dht.h"
+#include "./includes/dht.h"
 
 #include <freertos/FreeRTOS.h>
 #include <string.h>
 #include <esp_log.h>
-#include <esp_idf_lib_helpers.h>
+#include "./includes/esp_idf_lib_helpers.h"
 
 // DHT timer precision in microseconds
 #define DHT_TIMER_INTERVAL 2

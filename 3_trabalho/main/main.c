@@ -7,16 +7,16 @@
 #include "freertos/queue.h"
 #include "esp_log.h"
 #include "esp_wifi.h"
-#include "criaJson.h"
 #include "esp_event.h"
 #include "nvs_flash.h"
 #include "freertos/semphr.h"
 
-#include "led.h"
-#include "dht.h"
-#include "botao.h"
-#include "wifi.h"
-#include "mqtt.h"
+#include "./includes/criaJson.h"
+#include "./includes/led.h"
+#include "./includes/dht.h"
+#include "./includes/botao.h"
+#include "./includes/wifi.h"
+#include "./includes/mqtt.h"
 
 #define LED 2
 #define GPIO_N4 4
@@ -26,8 +26,6 @@ xQueueHandle filaDeInterrupcao;
 xSemaphoreHandle conexaoWifiSemaphore;
 xSemaphoreHandle conexaoMQTTSemaphore;
 xSemaphoreHandle esperaLed;
-
-char *macAddress;
 
 // void getMacAddress()
 // {
@@ -53,7 +51,7 @@ void conectadoWifi(void *params)
         if (xSemaphoreTake(conexaoWifiSemaphore, portMAX_DELAY))
         {
             // Processamento Internet
-            printf("start msqtt\n");
+            printf("start mqtt\n");
             mqtt_start();
         }
     }
@@ -73,24 +71,24 @@ void trataComunicacaoComServidor(void *params)
             mandaMensagem("temperatura", temperatura);
             mandaMensagem("umidade", umidade);
             mandaMensagemEstado();
-            vTaskDelay(30000 / portTICK_PERIOD_MS);
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
         }
     }
 }
 
-void getDhtTemperature(void *params)
-{
-    float temperatura, umidade;
-    while (1)
-    {
-        dht_read_float_data(DHT_TYPE_DHT11, GPIO_N4, &umidade, &temperatura);
-        ESP_LOGI("A", "temp: %f, humidity: %f", temperatura, umidade);
-        mandaMensagem("temperatura", temperatura);
-        mandaMensagem("umidade", umidade);
-        mandaMensagemEstado();
-        vTaskDelay(20000 / portTICK_PERIOD_MS);
-    }
-}
+// void getDhtTemperature(void *params)
+// {
+//     float temperatura, umidade;
+//     while (1)
+//     {
+//         dht_read_float_data(DHT_TYPE_DHT11, GPIO_N4, &umidade, &temperatura);
+//         ESP_LOGI("A", "temp: %f, humidity: %f", temperatura, umidade);
+//         mandaMensagem("temperatura", temperatura);
+//         mandaMensagem("umidade", umidade);
+//         mandaMensagemEstado();
+//         vTaskDelay(2000 / portTICK_PERIOD_MS);
+//     }
+// }
 
 
 void app_main(void)
@@ -116,7 +114,7 @@ void app_main(void)
     xTaskCreate(&conectadoWifi, "Conexão ao MQTT", 4096, NULL, 1, NULL);
     xTaskCreate(&trataComunicacaoComServidor, "Comunicação com Broker", 4096, NULL, 1, NULL);
     xTaskCreate(trataInterrupcaoBotao, "TrataBotao", 4096, NULL, 1, NULL);
-    xTaskCreate(getDhtTemperature, "getTemp", 4096, NULL, 1, NULL);
+    // xTaskCreate(getDhtTemperature, "getTemp", 4096, NULL, 1, NULL);
 
 
 }

@@ -17,10 +17,10 @@
 
 #include "esp_log.h"
 #include "mqtt_client.h"
-#include "main.h"
-#include "myNvs.h"
 
-#include "mqtt.h"
+#include "./includes/main.h"
+#include "./includes/myNvs.h"
+#include "./includes/mqtt.h"
 
 #define TAG "MQTT"
 
