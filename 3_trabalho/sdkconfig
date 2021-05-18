@@ -128,8 +128,8 @@ CONFIG_PARTITION_TABLE_MD5=y
 #
 # Configuração do Wifi Configuration
 #
-CONFIG_ESP_WIFI_SSID="Ubnt Paulo_IoT"
-CONFIG_ESP_WIFI_PASSWORD="pg340502."
+CONFIG_ESP_WIFI_SSID="wifi"
+CONFIG_ESP_WIFI_PASSWORD="password"
 CONFIG_ESP_MAXIMUM_RETRY=5
 # end of Configuração do Wifi Configuration
 
