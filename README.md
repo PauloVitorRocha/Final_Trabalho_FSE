@@ -10,6 +10,17 @@
 git clone https://github.com/PauloVitorRocha/Final_Trabalho_FSE.git
 ```
 
+#### Para o servidor:
+```
+cd Final_Trabalho_FSE/sv
+pip install -r requirements.txt
+```
+após a instalação dos requirements basta rodar:
+```
+python3 sv.py
+```
+
+
 #### Para a ESP32 use:
 ```
 cd Final_Trabalho_FSE/3_trabalho
@@ -23,12 +34,3 @@ e por fim:
 idf.py -p {PORT} flash monitor
 ```
 
-#### Para o servidor:
-```
-cd Final_Trabalho_FSE/sv
-pip install -r requirements.txt
-```
-após a instalação dos requirements basta rodar:
-```
-python3 sv.py
-```
