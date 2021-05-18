@@ -10,7 +10,7 @@
 #define LED 2
 
 void inicializaLed();
-void ligaDesligaLed();
+void ligaLed();
 void desligaLed();
 
 #endif

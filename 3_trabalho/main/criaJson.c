@@ -70,7 +70,7 @@ void mandaMensagemEstado()
     while (criaJsonStr(json, id));
 
     cJSON *saida = NULL;
-    while (criaJson(json, saida, "saida", estadoLed));
+    while (criaJson(json, saida, "saida", !estadoLed));
 
     cJSON *entrada = NULL;
     while (criaJson(json, entrada, "entrada", clickBotao));
@@ -79,6 +79,7 @@ void mandaMensagemEstado()
     char enviaEstado[500];
     sprintf(enviaEstado, "%s/estado", topicoComodo);
     printf("estado(mandaMensagemEstado) = %s\n", enviaEstado);
+    printf("msg = %s\n", info);
     mqtt_envia_mensagem(enviaEstado, info);
     cJSON_Delete(json);
 }

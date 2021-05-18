@@ -45,7 +45,7 @@ void getMacAddress()
     {
         interm[i] = mac[i];
         sprintf(macAddress, "%X", interm[i]);
-        macAddress += 2;
+        macAddress += 3;
     }
     macAddress -= 12;
 }
@@ -101,24 +101,16 @@ void pega_Comodo_MQTT_DATA(char buffer[])
     else
     {
         atributte = cJSON_GetObjectItemCaseSensitive(jsonComodo, "saida");
-        if (cJSON_IsNumber(atributte) && (atributte->valueint == 0 || atributte->valueint == 1))
+        if (cJSON_IsNumber(atributte) && (atributte->valueint == 0))
         {
-            ligaDesligaLed(atributte->valueint);
+            desligaLed(atributte->valueint);
+        }
+        atributte = cJSON_GetObjectItemCaseSensitive(jsonComodo, "saida");
+        if (cJSON_IsNumber(atributte) && (atributte->valueint == 1))
+        {
+            ligaLed(atributte->valueint);
         }
     }
-    // isLP = cJSON_GetObjectItemCaseSensitive(jsonLP, "isLP");
-    // if (cJSON_IsNumber(isLP) && (isLP->valueint == 1))
-    // {
-    //     isLowPower = isLP->valueint;
-    //     printf("I AM LOW POWER ESP\n");
-    //     gpio_pad_select_gpio(BOTAO);
-    //     gpio_set_direction(BOTAO, GPIO_MODE_INPUT);
-    //     // Habilita o botão para acordar a placa
-    //     gpio_wakeup_enable(BOTAO, GPIO_INTR_LOW_LEVEL);
-    //     esp_sleep_enable_gpio_wakeup();
-    //     uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
-    //     esp_light_sleep_start();
-    // }
     shouldReset = cJSON_GetObjectItemCaseSensitive(jsonRestart, "reset");
     if (cJSON_IsNumber(shouldReset) && (shouldReset->valueint == 1))
     {
@@ -202,5 +194,5 @@ void mqtt_envia_mensagem(char *topico, char *mensagem)
 {
     int message_id = esp_mqtt_client_publish(client, topico, mensagem, 0, 1, 0);
     printf("manda msg(mqtt_envia_mensagem): %s para topico %s\n", mensagem, topico);
-        ESP_LOGI(TAG, "Mensagem enviada, ID: %d", message_id);
+    ESP_LOGI(TAG, "Mensagem enviada, ID: %d", message_id);
 }

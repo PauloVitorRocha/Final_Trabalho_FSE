@@ -8,13 +8,13 @@ void inicializaLed()
     gpio_set_direction(LED, GPIO_MODE_OUTPUT);
 }
 
-void ligaDesligaLed()
+void ligaLed()
 {
-    gpio_set_level(LED, estadoLed);
-    estadoLed = !estadoLed;
+    gpio_set_level(LED, 1);
+    estadoLed = 0;
 }
 void desligaLed()
 {
     gpio_set_level(LED, 0);
-    estadoLed=0;
+    estadoLed=1;
 }
