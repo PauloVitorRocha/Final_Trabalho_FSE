@@ -83,10 +83,8 @@ void pega_Comodo_MQTT_DATA(char buffer[])
 {
 
     cJSON *jsonComodo = cJSON_Parse(buffer);
-    cJSON *jsonLP = cJSON_Parse(buffer);
     cJSON *jsonRestart = cJSON_Parse(buffer);
     const cJSON *atributte = NULL;
-    const cJSON *isLP = NULL;
     const cJSON *shouldReset = NULL;
     
     atributte = cJSON_GetObjectItemCaseSensitive(jsonComodo, "comodo");
@@ -124,7 +122,6 @@ void pega_Comodo_MQTT_DATA(char buffer[])
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 {
-    esp_mqtt_client_handle_t client = event->client;
     // int msg_id;
 
     switch (event->event_id)
