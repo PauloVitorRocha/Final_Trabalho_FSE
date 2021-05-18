@@ -11,5 +11,6 @@
 
 void inicializaLed();
 void ligaDesligaLed();
+void desligaLed();
 
 #endif

@@ -13,3 +13,8 @@ void ligaDesligaLed()
     gpio_set_level(LED, estadoLed);
     estadoLed = !estadoLed;
 }
+void desligaLed()
+{
+    gpio_set_level(LED, 0);
+    estadoLed=0;
+}

@@ -27,22 +27,6 @@ xSemaphoreHandle conexaoWifiSemaphore;
 xSemaphoreHandle conexaoMQTTSemaphore;
 xSemaphoreHandle esperaLed;
 
-// void getMacAddress()
-// {
-
-//     uint8_t *mac = (uint8_t *)malloc(sizeof(uint8_t) * 15);
-//     esp_efuse_mac_get_default(mac);
-//     int interm[20];
-//     macAddress = (char *)malloc(sizeof(char *) * 100);
-//     for (int i = 0; i < 6; i++)
-//     {
-//         interm[i] = mac[i];
-//         sprintf(macAddress, "%X", interm[i]);
-//         macAddress += 2;
-//     }
-//     macAddress -= 12;
-//     // printf("MAC ADDRESS = %s\n", macAddress);
-// }
 
 void conectadoWifi(void *params)
 {
@@ -76,20 +60,6 @@ void trataComunicacaoComServidor(void *params)
     }
 }
 
-// void getDhtTemperature(void *params)
-// {
-//     float temperatura, umidade;
-//     while (1)
-//     {
-//         dht_read_float_data(DHT_TYPE_DHT11, GPIO_N4, &umidade, &temperatura);
-//         ESP_LOGI("A", "temp: %f, humidity: %f", temperatura, umidade);
-//         mandaMensagem("temperatura", temperatura);
-//         mandaMensagem("umidade", umidade);
-//         mandaMensagemEstado();
-//         vTaskDelay(2000 / portTICK_PERIOD_MS);
-//     }
-// }
-
 
 void app_main(void)
 {
@@ -114,7 +84,6 @@ void app_main(void)
     xTaskCreate(&conectadoWifi, "Conexão ao MQTT", 4096, NULL, 1, NULL);
     xTaskCreate(&trataComunicacaoComServidor, "Comunicação com Broker", 4096, NULL, 1, NULL);
     xTaskCreate(trataInterrupcaoBotao, "TrataBotao", 4096, NULL, 1, NULL);
-    // xTaskCreate(getDhtTemperature, "getTemp", 4096, NULL, 1, NULL);
 
 
 }

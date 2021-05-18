@@ -106,24 +106,25 @@ void pega_Comodo_MQTT_DATA(char buffer[])
             ligaDesligaLed(atributte->valueint);
         }
     }
-    isLP = cJSON_GetObjectItemCaseSensitive(jsonLP, "isLP");
-    if (cJSON_IsNumber(isLP) && (isLP->valueint == 1))
-    {
-        isLowPower = isLP->valueint;
-        printf("I AM LOW POWER ESP\n");
-        gpio_pad_select_gpio(BOTAO);
-        gpio_set_direction(BOTAO, GPIO_MODE_INPUT);
-        // Habilita o botão para acordar a placa
-        gpio_wakeup_enable(BOTAO, GPIO_INTR_LOW_LEVEL);
-        esp_sleep_enable_gpio_wakeup();
-        uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
-        esp_light_sleep_start();
-    }
+    // isLP = cJSON_GetObjectItemCaseSensitive(jsonLP, "isLP");
+    // if (cJSON_IsNumber(isLP) && (isLP->valueint == 1))
+    // {
+    //     isLowPower = isLP->valueint;
+    //     printf("I AM LOW POWER ESP\n");
+    //     gpio_pad_select_gpio(BOTAO);
+    //     gpio_set_direction(BOTAO, GPIO_MODE_INPUT);
+    //     // Habilita o botão para acordar a placa
+    //     gpio_wakeup_enable(BOTAO, GPIO_INTR_LOW_LEVEL);
+    //     esp_sleep_enable_gpio_wakeup();
+    //     uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
+    //     esp_light_sleep_start();
+    // }
     shouldReset = cJSON_GetObjectItemCaseSensitive(jsonRestart, "reset");
     if (cJSON_IsNumber(shouldReset) && (shouldReset->valueint == 1))
     {
         reset = shouldReset->valueint;
         printf("Hora de resetar\n");
+        desligaLed();
         erase_nvs();
         esp_restart();
     }

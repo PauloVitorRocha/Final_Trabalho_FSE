@@ -7,6 +7,7 @@ import _thread
 import sys
 import signal
 import os
+from datetime import date, datetime
 
 
 registerEspSemaphore = threading.Event()
@@ -61,23 +62,23 @@ def on_message(client, userdata, message):
         if(isRegistered!=-1):
             print("Esp já cadastrada")
             time.sleep(1)
-            mainMenuSemaphore.set()
+            # mainMenuSemaphore.set()
             return
 
         hasNewEsp=1
         registerEspSemaphore.wait()
         if (contador_disp == 5):
             print("Número máx de esps atingido")
-            mainMenuSemaphore.set()
+            # mainMenuSemaphore.set()
             return
 
         comodo = input('escreva o comodo onde a esp será cadastrada\n')
         comodo = unidecode.unidecode(comodo).replace(' ', '').lower()
-        isLP = input('Esp é Low Power?(0/1)\n')
+        # isLP = input('Esp é Low Power?(0/1)\n')
         
         msg = {}
         msg['comodo'] = comodo
-        msg['isLP'] = int(isLP)
+        # msg['isLP'] = int(isLP)
         jsonComodo = json.dumps(msg)
 
         client.unsubscribe('fse2020/170062465/dispositivos/#')
@@ -104,13 +105,22 @@ def on_message(client, userdata, message):
             cliente[result].statusOut = saida
             cliente[result].statusIn = entrada
 
+
 def menuEsps():
     global contador_disp
     global cliente
     while(1):
         espMenuSemaphore.wait()
         os.system('cls' if os.name == 'nt' else 'clear')
-        print('''----------------- MENU -----------------
+        if hasNewEsp:
+            print('''----------------- MENU -----------------
+# Nova esp para ser cadastrada, volte para o menu principal para cadastrar
+5- Ligar led
+6- Apagar Esp
+7- voltar\n
+''')    
+        else:
+            print('''----------------- MENU -----------------
 5- Ligar led
 6- Apagar Esp
 7- voltar\n
@@ -243,10 +253,33 @@ def menu():
         time.sleep(3)
 
 
+def csvValues():
+    global contador_disp
+    global cliente
+    now = datetime.now()
+    dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
+    print("im csv",dt_string)
+    f = open(dt_string+'.csv', 'w')
+    f.write("Time, Device ID, temperature, humidity, botao, led\n")
+    f.close()
+    while(1):
+        if(contador_disp>0):
+            f = open(dt_string+'.csv', 'a')
+            updatedDate = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+
+            for i in range(contador_disp):
+                if(cliente[i].temp>2):
+                    f.write(
+                        f'{updatedDate}, {cliente[i].id}, {cliente[i].temp}, {cliente[i].hmd}, {cliente[i].statusIn}, {not cliente[i].statusOut}\n')
+            f.close()
+        time.sleep(1)    
+
+
 t0 = threading.Thread(target=semaphoreKeeper).start()
 t1 = threading.Thread(target=menu).start()
 # t2 = threading.Thread(target=inputzao).start()
 t3 = threading.Thread(target=menuEsps).start()
+t4 = threading.Thread(target=csvValues).start()
 
 while True:
     client.on_connect = on_connect
