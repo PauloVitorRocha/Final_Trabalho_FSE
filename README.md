@@ -13,7 +13,7 @@ git clone https://github.com/PauloVitorRocha/Final_Trabalho_FSE.git
 #### Primeiramente para o servidor:
 ```
 cd Final_Trabalho_FSE/sv
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 após a instalação dos requirements basta rodar:
 ```
