@@ -10,7 +10,7 @@
 git clone https://github.com/PauloVitorRocha/Final_Trabalho_FSE.git
 ```
 
-#### Para o servidor:
+#### Primeiramente para o servidor:
 ```
 cd Final_Trabalho_FSE/sv
 pip install -r requirements.txt
