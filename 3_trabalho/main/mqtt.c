@@ -45,7 +45,7 @@ void getMacAddress()
     {
         interm[i] = mac[i];
         sprintf(macAddress, "%X", interm[i]);
-        macAddress += 3;
+        macAddress += 2;
     }
     macAddress -= 12;
 }

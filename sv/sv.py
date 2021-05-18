@@ -275,7 +275,7 @@ def verificaAlarme():
     global svRunning
     global alarme
     mixer.init()
-    mixer.music.load('beep.mp3')
+    mixer.music.load('beep-01a.wav')
 
     while(svRunning):
         tocaAlarme=0
