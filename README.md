@@ -5,6 +5,8 @@
 
 **Matrícula**: 17/0062465
 
+Para detalhes de como funciona o projeto, assista o [video](https://youtu.be/c-ymt3ST6hE)
+
 ### Executando o projeto
 ```
 git clone https://github.com/PauloVitorRocha/Final_Trabalho_FSE.git
